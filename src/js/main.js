@@ -1,5 +1,6 @@
 var d3 = require('d3');
 var $ = require("jquery");
+require("component-responsive-frame/child");
 
 var margin = {
   top: 15,
@@ -11,17 +12,17 @@ if (screen.width > 768) {
   var width = 900 - margin.left - margin.right;
   var height = 400 - margin.top - margin.bottom;
 } else if (screen.width <= 768 && screen.width > 480) {
-  var width = 460 - margin.left - margin.right;
-  var height = 250 - margin.top - margin.bottom;
+  var width = 750 - margin.left - margin.right;
+  var height = 400 - margin.top - margin.bottom;
 } else if (screen.width <= 480) {
   var margin = {
     top: 15,
-    right: 15,
+    right: 10,
     bottom: 25,
-    left: 55
+    left: 45
   };
   var width = 310 - margin.left - margin.right;
-  var height = 220 - margin.top - margin.bottom;
+  var height = 250 - margin.top - margin.bottom;
 
 }
 
@@ -78,13 +79,15 @@ function bubblechart() {
 
   // Parse the date / time
   var parseFinishTime = d3.time.format("%H:%M:%S").parse;
+  var formatthousands = d3.format("0,000");
 
   // convert strings to numbers
   raceData.forEach(function(d) {
     d.race = d.Race;
     d.gender = d.Gender;
     d.elevation = +d.Elevation;
-    d.finishers = d.Finishers2015;
+    d.finishers = +d.Finishers2015;
+    d.finishers_text = formatthousands(d.Finishers2015);
     d.finishtime = parseFinishTime(d.FinishTime);
   })
 
@@ -96,14 +99,44 @@ function bubblechart() {
   var ypace = d3.time.scale()
       .range([height, 0]);
 
-  // use x-axis scale to set x-axis
-  var xAxisElev = d3.svg.axis()
-      .scale(xelev)
-      .orient("bottom");
+  if (screen.width <= 480) {
+    // use x-axis scale to set x-axis
+    var xAxisElev = d3.svg.axis()
+        .scale(xelev)
+        .orient("bottom")
+        .tickFormat(function(d) {
+            if ((d % 400) != 0) {
+              return '';
+            } else {
+              return d;
+            }
+          });
+  } else {
+    // use x-axis scale to set x-axis
+    var xAxisElev = d3.svg.axis()
+        .scale(xelev)
+        .orient("bottom");
+  }
 
-  var yAxisTime = d3.svg.axis().scale(ypace)
-      .orient("left")
-      .tickFormat(d3.time.format("%H:%M:%S"));
+  if (screen.width < 480) {
+    var yAxisTime = d3.svg.axis().scale(ypace)
+        .orient("left")
+        // .tickFormat(d3.time.format("%H:%M:%S"))
+        // .tickFormat(function(d) {
+        //     console.log(String(d)[20,22]);
+        //     if (String(d)[22] != "0") {
+        //       return '';
+        //     } else {
+        //       return d;
+        //     }
+        //   })
+          .tickFormat(d3.time.format("%H:%M"));
+  } else {
+    var yAxisTime = d3.svg.axis().scale(ypace)
+        .orient("left")
+        .tickFormat(d3.time.format("%H:%M"));
+  }
+
 
   // create SVG container for chart components
   var svgComp = d3.select(".elevation-finish-bubbles").append("svg")
@@ -112,16 +145,9 @@ function bubblechart() {
       .append("g")
       .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
-
-
   xelev.domain([-100,1800]);
-  // xelev.domain(d3.extent(raceCompData, function(d) { return d.elevation; })).nice();//.nice();
   ypace.domain([parseFinishTime('02:00:00'), parseFinishTime('03:20:00')]);
 
-  // var xElevMin = xelev.domain()[0];
-  // var xElevMax = xelev.domain()[1];
-  // // var xMax = 20;
-  //
   svgComp.append("g")
       .attr("class", "x axis")
       .attr("transform", "translate(0," + height + ")")
@@ -139,19 +165,26 @@ function bubblechart() {
       .append("text")
       .attr("class", "label")
       .attr("transform", "rotate(-90)")
-      .attr("x", -10)
+      .attr("x", 0)
       .attr("y", 10)
       .attr("dy", ".71em")
       .style("text-anchor", "end")
-      .text("Winning finish time in 2015");
+      .text("Winning finish time");
 
   // color in the dots
   svgComp.selectAll(".dot")
       .data(raceData)
       .enter().append("circle")
+      .attr("id", function(d) {
+        return (d.race.replace(/\s/g, '').replace(/'/g, "").replace(/\(|\)/g, "").toLowerCase()+d.gender);
+      })
+      .attr("class","dot")
       .attr("r", function(d) {
-        return d.finishers/2000+5;
-        // return 6;
+        if (screen.width <= 480){
+          return d.finishers/5000+7;
+        } else {
+          return d.finishers/2000+5;
+        }
       })
       .attr("cx", function(d) {
         return xelev(d.elevation);
@@ -164,8 +197,8 @@ function bubblechart() {
       .on("mouseover", function(d) {
           tooltip.html(`
               <div>Race: <b>${d.race}</b></div>
+              <div>Total finishers (M+F): <b>${d.finishers_text}</b></div>
               <div>Finish time: <b>${d.FinishTime}</b></div>
-              <div>Number of finishers: <b>${d.finishers}</b></div>
               <div>Gender: <b>${d.gender}</b></div>
           `);
           tooltip.style("visibility", "visible");
@@ -197,14 +230,11 @@ function bubblechart() {
     .attr("class","node");
 
   node.append("text")
-    .attr("x", function(d) { return xelev(d.elevation)-40; })
+    .attr("x", function(d) { return xelev(d.elevation)-20; })
     .attr("y", function(d) {return ypace(d.finishtime)+20; })
-    // .attr("id", function(d) {
-    //   return (d.race.replace(/\s/g, '').toLowerCase()+"text");
-    // })
     .attr("class","dottext")
     .style("fill","#696969")
-    .style("font-size","12px")
+    .style("font-size","14px")
     .style("font-style","italic")
     .style("visibility",function(d) {
       if (d.race == "San Francisco") {
@@ -212,7 +242,12 @@ function bubblechart() {
       }
     })
     .text(function(d) {
-        return (d.race+" ("+d.gender+")")
+        return ("SF ("+d.gender+")")
     });
+
+  $(".dot").click(function(){
+    $(".dot").removeClass("active");
+    $(this).addClass("active");
+  });
 
 }

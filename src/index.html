@@ -16,19 +16,19 @@
     <responsive-child>
 
       <div class="outer">
-        <div class="hed">How much does elevation impact finishing times?</div>
-        <div class="chatter">The SF marathon course is known for its hills. See how it stacks up against other awesome marathons. Maybe hills down't slow you down as much as you think! (Probably they do.)</div>
+        <div class="hed">Does elevation impact finishing times?</div>
+        <div class="chatter">The San Francisco Marathon is probably best known - and feared - for its hills. A comparison of races suggests maybe hills don’t slow us down as much as we think, but we’re also never going to be as speedy as some of the flat-and-fast marathons.</div>
 
         <div class="bubble-options" id="bubbleoptions">
           <div class="all selected" id="all">All top finishers</div>
-          <div class="men" id="men">Top men finishers</div>
-          <div class="women" id="women">Top women finishers</div>
+          <div class="men" id="men">Top male finishers</div>
+          <div class="women" id="women">Top female finishers</div>
         </div>
 
         <div id="elevation-finish-bubbles" class="elevation-finish-bubbles"></div>
 
-        <div class="credit">About the data: Races were chosen by awesomeness, as determined by Erin.</div>
-        <div class="source">Source: This is the source.</div>
+        <div class="credit">About the data: A sample of races were picked based on size, location and course challenges. All data is from 2015.</div>
+        <div class="source">Source: Data was compiled from individual race websites and <a href="http://findmymarathon.com/" target="_blank">FindMyMarathon.com</a>.</div>
       </div>
 
     </responsive-child>
@@ -38,6 +38,7 @@
     </script>
 
     <script src="app.js" async></script>
+    <script src="http://projects.sfchronicle.com/shared/js/responsive-child.js"></script>
     <%= t.include("partials/_helloSFC.html") %>
 
   </body>
