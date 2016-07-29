@@ -1,0 +1,44 @@
+<!doctype html>
+<html>
+  <head>
+    <title><%= json.project.title %></title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <link rel="stylesheet" type="text/css" href="style.css">
+    <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css">
+    <%= t.include("partials/_head.html") %>
+    <%= t.include("partials/_analytics_hearst.html") %>
+  </head>
+  <script>  var HDN = HDN || {}  </script>
+
+  <body>
+
+    <responsive-child>
+
+      <div class="outer">
+        <div class="hed">How much does elevation impact finishing times?</div>
+        <div class="chatter">The SF marathon course is known for its hills. See how it stacks up against other awesome marathons. Maybe hills down't slow you down as much as you think! (Probably they do.)</div>
+
+        <div class="bubble-options" id="bubbleoptions">
+          <div class="all selected" id="all">All top finishers</div>
+          <div class="men" id="men">Top men finishers</div>
+          <div class="women" id="women">Top women finishers</div>
+        </div>
+
+        <div id="elevation-finish-bubbles" class="elevation-finish-bubbles"></div>
+
+        <div class="credit">About the data: Races were chosen by awesomeness, as determined by Erin.</div>
+        <div class="source">Source: This is the source.</div>
+      </div>
+
+    </responsive-child>
+
+    <script>
+      var raceCompData = <%= JSON.stringify(csv.raceComparisons) %>;
+    </script>
+
+    <script src="app.js" async></script>
+    <%= t.include("partials/_helloSFC.html") %>
+
+  </body>
+</html>
